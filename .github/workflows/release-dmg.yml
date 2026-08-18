@@ -1,0 +1,76 @@
+name: Release macOS ARM64 DMG
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g. v2.0.0-arm64)'
+        required: false
+        default: 'v2.0.0-arm64'
+
+permissions:
+  contents: write
+
+jobs:
+  build-dmg:
+    name: Build & Release macOS ARM64 DMG
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt 6 and build dependencies
+        run: |
+          brew update
+          brew install qt@6 qtsvg qtmultimedia qtserialport
+
+      - name: Build SimulIDE
+        run: |
+          export PATH="/opt/homebrew/opt/qt@6/bin:$PATH"
+          cd build_XX
+          qmake ../SimulIDE.pro
+          make -j$(sysctl -n hw.ncpu)
+
+      - name: Bundle and create DMG with macdeployqt
+        run: |
+          export PATH="/opt/homebrew/opt/qt@6/bin:$PATH"
+          cd build_XX
+          macdeployqt executables/SimulIDE_2.0.0-/simulide.app -dmg
+
+      - name: Prepare Release Artifact
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.release_tag }}" ]; then
+            TAG_NAME="${{ github.event.inputs.release_tag }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG_NAME="${GITHUB_REF_NAME}"
+          else
+            TAG_NAME="v2.0.0-arm64"
+          fi
+          
+          DMG_NAME="SimulIDE-${TAG_NAME}-macOS-ARM64.dmg"
+          mv build_XX/executables/SimulIDE_2.0.0-/simulide.dmg "./${DMG_NAME}"
+          
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DMG_NAME }}
+          path: ${{ env.DMG_NAME }}
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: SimulIDE ${{ env.TAG_NAME }} (macOS ARM64)
+          files: ${{ env.DMG_NAME }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
