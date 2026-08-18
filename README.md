@@ -1,61 +1,92 @@
-# SimulIDE 
+# SimulIDE for Apple Silicon (ARM64) & Cross-Platform
 
-Electronic Circuit Simulator
+[![macOS ARM64](https://img.shields.io/badge/Platform-macOS%20ARM64%20(Apple%20Silicon)-black?style=flat&logo=apple)](https://github.com/nur-srijan/SimulIDE-on-ARM)
+[![Qt](https://img.shields.io/badge/Qt-6.x%20%7C%205.x-41CD52?style=flat&logo=qt)](https://www.qt.io/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](COPYING)
 
-**SimulIDE is a simple real time electronic circuit simulator**, intended for hobbyist or students to learn and experiment with analog and digital electronic circuits and microcontrollers.
-It supports PIC, AVR, Arduino and other MCUs and MPUs.
+**SimulIDE** is a fast, real-time electronic circuit simulator designed for hobbyists, educators, and engineers to experiment with analog, digital, and microcontroller-based circuits.
 
-**Simplicity, speed and ease of use** are the key features of this simulator.
-You can create, simulate and interact with your circuits within minutes, just drag components from the list, drop into the circuit, connect them and push the “power button” to see how it works.
+This fork provides **native Apple Silicon (ARM64) macOS support** with modern Qt 6 compatibility, retina display scaling, enhanced Dark Mode support, and UI fixes.
 
-Simulation speed is one of the most relevant characteristics of this simulator.
-It has been deeply optimized to achieve excellent speeds and low cpu usage.
+---
 
-SimulIDE also features a code Editor and Debugger for Arduino, GcBasic, PIC asm, AVR asm and others. It is possible to write, compile and do basic debugging with breakpoints, watch registers and global variables.
+## Key Features
 
+- **Real-Time Simulation**: Deeply optimized engine providing instant interactive feedback and low CPU overhead.
+- **Microcontrollers & Processors**: Built-in support for Arduino, AVR, PIC, MCS-51 (8051), 6502, and Z80.
+- **Rich Component Libraries**: 7400-series TTL ICs, CMOS logic, passive and active components, displays, motors, sensors, and meters.
+- **Integrated Code Editor & Debugger**: Write, compile, and debug firmware directly inside SimulIDE with breakpoints, memory watches, and register inspection.
+- **Custom Subcircuits**: Create and package reusable subcircuits and modular ICs.
+- **Modern UI & Dark Mode**: Native look and feel, high-contrast dark mode palettes, scalable icons, and high-DPI support.
 
-## Building SimulIDE:
+---
 
-Build dependencies:
+## Building on macOS (Apple Silicon ARM64)
 
- - Qt5 dev packages
- - Qt5Core
- - Qt5Gui
- - Qt5Xml
- - Qt5Widgets
- - Qt5Concurrent
- - Qt5svg dev
- - Qt5 Multimedia dev
- - Qt5 Serialport dev
- - Qt5 qmake
+### Prerequisites
 
- 
-Once installed go to build_XX folder, then:
+Install Xcode Command Line Tools and Qt 6 via [Homebrew](https://brew.sh):
 
-```
-$ qmake
-$ make
+```bash
+# Install Homebrew dependencies
+brew install qt@6 qtsvg qtmultimedia qtserialport
 ```
 
-In folder build_XX/executables/SimulIDE_x.x.x you will find executable and all files needed to run SimulIDE.
+Ensure the Homebrew Qt 6 bin directory is in your `PATH`:
 
+```bash
+export PATH="/opt/homebrew/opt/qt@6/bin:$PATH"
+```
 
+### Build Instructions
 
-## Running SimulIDE:
+1. **Clone the repository**:
+   ```bash
+   git clone git@github.com:nur-srijan/SimulIDE-on-ARM.git
+   cd SimulIDE-on-ARM
+   ```
 
-Run time dependencies:
+2. **Generate the Makefile with qmake**:
+   ```bash
+   cd build_XX
+   qmake ../SimulIDE.pro
+   ```
 
- - Qt5Core
- - Qt5Gui
- - Qt5Xml
- - Qt5svg
- - Qt5Widgets
- - Qt5Concurrent
- - Qt5 Multimedia
- - Qt5 Multimedia Plugins
- - Qt5 Serialport
+3. **Compile**:
+   ```bash
+   make -j$(sysctl -n hw.ncpu)
+   ```
 
+4. **Run SimulIDE**:
+   The compiled native `.app` bundle is located in `build_XX/executables/SimulIDE_2.0.0-/`:
+   ```bash
+   open executables/SimulIDE_2.0.0-/simulide.app
+   ```
 
-No need for installation, place SimulIDE folder wherever you want and run the executable.
+---
 
+## Building on Linux
 
+### Prerequisites (Ubuntu/Debian)
+
+```bash
+sudo apt-get install build-essential qtbase5-dev qtmultimedia5-dev \
+    libqt5svg5-dev libqt5serialport5-dev qt5-qmake
+```
+
+### Build
+
+```bash
+cd build_XX
+qmake ../SimulIDE.pro
+make -j$(nproc)
+```
+
+The executable will be located in `build_XX/executables/SimulIDE_x.x.x/simulide`.
+
+---
+
+## Upstream & Acknowledgements
+
+- **Original Project**: Created and maintained by [Santiago González](https://simulide.com) ([Arcachofo/SimulIDE-dev](https://github.com/Arcachofo/SimulIDE-dev)).
+- **License**: GNU General Public License v3 (see [COPYING](COPYING)).
