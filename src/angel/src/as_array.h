@@ -40,6 +40,40 @@
 #pragma warning( disable : 4345 ) // warning about a change in how the code is handled in this version
 #endif
 
+#ifndef BEGIN_AS_NAMESPACE
+#define BEGIN_AS_NAMESPACE
+#define END_AS_NAMESPACE
+#endif
+
+#ifndef AS_PTR_SIZE
+  #if defined(__LP64__) || defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__arm64__) || defined(__aarch64__)
+    #define AS_PTR_SIZE 8
+  #else
+    #define AS_PTR_SIZE 4
+  #endif
+#endif
+
+typedef unsigned int asUINT;
+
+#ifndef asASSERT
+#include <assert.h>
+#define asASSERT( x ) assert( x )
+#endif
+
+// Forward declarations for AngelScript memory management functions to satisfy Phase 1 lookup in templates
+typedef void* (*asALLOCFUNC_t)(size_t);
+typedef void  (*asFREEFUNC_t)(void*);
+
+#ifndef asNEWARRAY
+extern asALLOCFUNC_t userAlloc;
+#define asNEWARRAY( x, cnt ) (x*) userAlloc( sizeof( x ) * cnt )
+#endif
+
+#ifndef asDELETEARRAY
+extern asFREEFUNC_t userFree;
+#define asDELETEARRAY( ptr ) userFree( ptr )
+#endif
+
 BEGIN_AS_NAMESPACE
 
 template <class T> class asCArray {

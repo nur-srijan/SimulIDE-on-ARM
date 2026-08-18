@@ -498,7 +498,9 @@ bool Circuit::saveString( QString fileName, QString doc ) {
         return false;
     }
     QTextStream out( &file );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     out.setCodec( "UTF-8" );
+#endif
     out << doc;
     file.close();
 
@@ -1016,7 +1018,9 @@ void Circuit::deleteNewConnector() {
     bom.sort();
 
     QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     out.setCodec("UTF-8");
+#endif
     out <<  "\nCircuit: ";
     out <<  QFileInfo( m_filePath ).fileName();
     out <<  "\n\n";

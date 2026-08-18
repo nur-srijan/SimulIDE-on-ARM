@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <QIcon>
 #include <QList>
 #include <QtMath>
 
@@ -14,6 +15,8 @@ class QString;
 class QPointF;
 class QPoint;
 class Pin;
+
+QIcon getAppIcon( const QString& path );
 
 #define unitToVal( val, mult )                                                                                         \
     if ( mult == " n" )                                                                                                \

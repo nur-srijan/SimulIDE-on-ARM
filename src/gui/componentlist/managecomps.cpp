@@ -51,8 +51,14 @@ void manCompDialog::addItem( TreeItem* treeItem ) {
         listItem->setFlags( Qt::NoItemFlags );
         shortItem->setFlags( Qt::NoItemFlags );
 
-        listItem->setBackground( QColor( 240, 235, 245 ) );
-        listItem->setForeground( QBrush( QColor( 110, 95, 50 ) ) );
+        bool dark = MainWindow::self() ? MainWindow::self()->isDarkMode() : false;
+        if ( dark ) {
+            listItem->setBackground( QColor( 42, 60, 55 ) );
+            listItem->setForeground( QBrush( QColor( 210, 235, 225 ) ) );
+        } else {
+            listItem->setBackground( QColor( 240, 235, 245 ) );
+            listItem->setForeground( QBrush( QColor( 110, 95, 50 ) ) );
+        }
 
         for ( int i = 0; i < childCount; i++ )
             addItem( (TreeItem*) treeItem->child( i ) );
@@ -75,13 +81,21 @@ void manCompDialog::initialize( TreeItem* treeItem ) {
     QTableWidgetItem* item = m_treeToShort.key( treeItem );
     QTableWidgetItem* lItem = m_treeToList.key( treeItem );
 
+    bool dark = MainWindow::self() ? MainWindow::self()->isDarkMode() : false;
     for ( QTableWidgetItem* listItem : m_treeToList.keys() ) {
         if ( listItem->flags() == 0 )
             continue;
-        if ( treeItem && listItem == lItem )
-            listItem->setBackground( QColor( 255, 235, 155 ) );
-        else
-            listItem->setBackground( QColor( 255, 255, 255 ) );
+        if ( treeItem && listItem == lItem ) {
+            if ( dark )
+                listItem->setBackground( QColor( 55, 75, 95 ) );
+            else
+                listItem->setBackground( QColor( 255, 235, 155 ) );
+        } else {
+            if ( dark )
+                listItem->setBackground( QColor( 40, 40, 40 ) );
+            else
+                listItem->setBackground( QColor( 255, 255, 255 ) );
+        }
     }
 
     if ( !treeItem )

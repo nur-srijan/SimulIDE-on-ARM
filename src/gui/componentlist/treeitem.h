@@ -36,6 +36,9 @@ public:
     //void setItemHidden( bool h );
 
     void setItemType( treItemType_t itemType );
+    treItemType_t itemType() { return m_itemType; }
+
+    void updateColors();
 
     QString toString( QString indent = "" );
 

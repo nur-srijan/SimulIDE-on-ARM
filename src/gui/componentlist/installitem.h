@@ -27,6 +27,7 @@ public:
     //int64_t version() { return m_version; }
     QString toString(); // { return m_itemStr; }
     void updated();
+    void updateColors();
 
 private:
     void installClicked();

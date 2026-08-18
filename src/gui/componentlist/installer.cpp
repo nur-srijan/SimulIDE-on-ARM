@@ -272,4 +272,11 @@ void Installer::writeSettings() {
     QSettings* settings = MainWindow::self()->settings();
     settings->setValue( "library/installed", installed );
 }
+
+void Installer::updateColors() {
+    for ( InstallItem* item : m_items.values() ) {
+        if ( item )
+            item->updateColors();
+    }
+}
 //#include moc_installer.cpp

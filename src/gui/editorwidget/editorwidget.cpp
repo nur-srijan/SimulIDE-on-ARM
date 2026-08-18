@@ -394,7 +394,9 @@ bool EditorWidget::saveFile( QString fileName ) {
     QApplication::setOverrideCursor( Qt::WaitCursor );
 
     QTextStream out( &file );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     out.setCodec( "UTF-8" );
+#endif
 
     CodeEditor* ce = getCodeEditor();
     out << ce->toPlainText();
@@ -700,99 +702,127 @@ void EditorWidget::createActions() {
         connect( recentFileActs[i], SIGNAL( triggered() ), this, SLOT( openRecentFile() ), Qt::UniqueConnection );
     }
 
-    newAct = new QAction( QIcon( ":/new.svg" ), tr( "&New\tCtrl+N" ), this );
+    newAct = new QAction( getAppIcon( ":/new.svg" ), tr( "&New\tCtrl+N" ), this );
     newAct->setStatusTip( tr( "Create a new file" ) );
     connect( newAct, SIGNAL( triggered() ), this, SLOT( newFile() ), Qt::UniqueConnection );
 
-    openAct = new QAction( QIcon( ":/open.svg" ), tr( "&Open...\tCtrl+O" ), this );
+    openAct = new QAction( getAppIcon( ":/open.svg" ), tr( "&Open...\tCtrl+O" ), this );
     openAct->setStatusTip( tr( "Open an existing file" ) );
     connect( openAct, SIGNAL( triggered() ), this, SLOT( open() ), Qt::UniqueConnection );
 
-    saveAct = new QAction( QIcon( ":/save.svg" ), tr( "&Save\tCtrl+S" ), this );
+    saveAct = new QAction( getAppIcon( ":/save.svg" ), tr( "&Save\tCtrl+S" ), this );
     saveAct->setStatusTip( tr( "Save the document to disk" ) );
     saveAct->setEnabled( false );
     connect( saveAct, SIGNAL( triggered() ), this, SLOT( save() ), Qt::UniqueConnection );
 
-    saveAsAct = new QAction( QIcon( ":/saveas.svg" ), tr( "Save &As...\tCtrl+Shift+S" ), this );
+    saveAsAct = new QAction( getAppIcon( ":/saveas.svg" ), tr( "Save &As...\tCtrl+Shift+S" ), this );
     saveAsAct->setStatusTip( tr( "Save the document under a new name" ) );
     saveAsAct->setEnabled( false );
     connect( saveAsAct, SIGNAL( triggered() ), this, SLOT( saveAs() ), Qt::UniqueConnection );
 
-    cutAct = new QAction( QIcon( ":/cut.svg" ), tr( "Cu&t\tCtrl+X" ), this );
+    cutAct = new QAction( getAppIcon( ":/cut.svg" ), tr( "Cu&t\tCtrl+X" ), this );
     cutAct->setStatusTip( tr( "Cut the current selection's contents to the clipboard" ) );
     cutAct->setEnabled( false );
     connect( cutAct, SIGNAL( triggered() ), this, SLOT( cut() ), Qt::UniqueConnection );
 
-    copyAct = new QAction( QIcon( ":/copy.svg" ), tr( "&Copy\tCtrl+C" ), this );
+    copyAct = new QAction( getAppIcon( ":/copy.svg" ), tr( "&Copy\tCtrl+C" ), this );
     copyAct->setStatusTip( tr( "Copy the current selection's contents to the clipboard" ) );
     copyAct->setEnabled( false );
     connect( copyAct, SIGNAL( triggered() ), this, SLOT( copy() ), Qt::UniqueConnection );
 
-    pasteAct = new QAction( QIcon( ":/paste.svg" ), tr( "&Paste\tCtrl+V" ), this );
+    pasteAct = new QAction( getAppIcon( ":/paste.svg" ), tr( "&Paste\tCtrl+V" ), this );
     pasteAct->setStatusTip( tr( "Paste the clipboard's contents into the current selection" ) );
     pasteAct->setEnabled( false );
     connect( pasteAct, SIGNAL( triggered() ), this, SLOT( paste() ), Qt::UniqueConnection );
 
-    undoAct = new QAction( QIcon( ":/undo.svg" ), tr( "Undo\tCtrl+Z" ), this );
+    undoAct = new QAction( getAppIcon( ":/undo.svg" ), tr( "Undo\tCtrl+Z" ), this );
     undoAct->setStatusTip( tr( "Undo the last action" ) );
     undoAct->setEnabled( false );
     connect( undoAct, SIGNAL( triggered() ), this, SLOT( undo() ), Qt::UniqueConnection );
 
-    redoAct = new QAction( QIcon( ":/redo.svg" ), tr( "Redo\tCtrl+Shift+Z" ), this );
+    redoAct = new QAction( getAppIcon( ":/redo.svg" ), tr( "Redo\tCtrl+Shift+Z" ), this );
     redoAct->setStatusTip( tr( "Redo the last action" ) );
     redoAct->setEnabled( false );
     connect( redoAct, SIGNAL( triggered() ), this, SLOT( redo() ) );
 
-    runAct = new QAction( QIcon( ":/runtobk.png" ), tr( "Run To Breakpoint" ), this );
+    runAct = new QAction( getAppIcon( ":/runtobk.png" ), tr( "Run To Breakpoint" ), this );
     runAct->setStatusTip( tr( "Run to next breakpoint" ) );
     runAct->setEnabled( false );
     connect( runAct, SIGNAL( triggered() ), this, SLOT( run() ), Qt::UniqueConnection );
 
-    stepAct = new QAction( QIcon( ":/step.svg" ), tr( "Step" ), this );
+    stepAct = new QAction( getAppIcon( ":/step.svg" ), tr( "Step" ), this );
     stepAct->setStatusTip( tr( "Step debugger" ) );
     stepAct->setEnabled( false );
     connect( stepAct, SIGNAL( triggered() ), this, SLOT( step() ), Qt::UniqueConnection );
 
-    stepOverAct = new QAction( QIcon( ":/rotatecw.svg" ), tr( "StepOver" ), this );
+    stepOverAct = new QAction( getAppIcon( ":/rotatecw.svg" ), tr( "StepOver" ), this );
     stepOverAct->setStatusTip( tr( "Step Over" ) );
     stepOverAct->setEnabled( false );
     stepOverAct->setVisible( false );
     connect( stepOverAct, SIGNAL( triggered() ), this, SLOT( stepOver() ), Qt::UniqueConnection );
 
-    pauseAct = new QAction( QIcon( ":/pause.svg" ), tr( "Pause" ), this );
+    pauseAct = new QAction( getAppIcon( ":/pause.svg" ), tr( "Pause" ), this );
     pauseAct->setStatusTip( tr( "Pause debugger" ) );
     pauseAct->setEnabled( false );
     connect( pauseAct, SIGNAL( triggered() ), this, SLOT( pause() ), Qt::UniqueConnection );
 
-    resetAct = new QAction( QIcon( ":/reset.svg" ), tr( "Reset" ), this );
+    resetAct = new QAction( getAppIcon( ":/reset.svg" ), tr( "Reset" ), this );
     resetAct->setStatusTip( tr( "Reset debugger" ) );
     resetAct->setEnabled( false );
     connect( resetAct, SIGNAL( triggered() ), this, SLOT( reset() ), Qt::UniqueConnection );
 
-    stopAct = new QAction( QIcon( ":/stop.svg" ), tr( "Stop Debugger" ), this );
+    stopAct = new QAction( getAppIcon( ":/stop.svg" ), tr( "Stop Debugger" ), this );
     stopAct->setStatusTip( tr( "Stop debugger" ) );
     stopAct->setEnabled( false );
     connect( stopAct, SIGNAL( triggered() ), this, SLOT( stop() ), Qt::UniqueConnection );
 
-    compileAct = new QAction( QIcon( ":/verify.svg" ), tr( "Compile" ), this );
+    compileAct = new QAction( getAppIcon( ":/verify.svg" ), tr( "Compile" ), this );
     compileAct->setStatusTip( tr( "Compile Source" ) );
     compileAct->setEnabled( false );
     connect( compileAct, SIGNAL( triggered() ), this, SLOT( compile() ), Qt::UniqueConnection );
 
-    loadAct = new QAction( QIcon( ":/upload.svg" ), tr( "UpLoad" ), this );
+    loadAct = new QAction( getAppIcon( ":/upload.svg" ), tr( "UpLoad" ), this );
     loadAct->setStatusTip( tr( "Load Firmware" ) );
     loadAct->setEnabled( false );
     connect( loadAct, SIGNAL( triggered() ), this, SLOT( upload() ), Qt::UniqueConnection );
 
-    findQtAct = new QAction( QIcon( ":/find.svg" ), tr( "Find Replace" ), this );
+    findQtAct = new QAction( getAppIcon( ":/find.svg" ), tr( "Find Replace" ), this );
     findQtAct->setStatusTip( tr( "Find Replace" ) );
     findQtAct->setEnabled( false );
     connect( findQtAct, SIGNAL( triggered() ), this, SLOT( findReplaceDialog() ), Qt::UniqueConnection );
 
-    debugAct = new QAction( QIcon( ":/debug.svg" ), tr( "Debug" ), this );
+    debugAct = new QAction( getAppIcon( ":/debug.svg" ), tr( "Debug" ), this );
     debugAct->setStatusTip( tr( "Start Debugger" ) );
     debugAct->setEnabled( false );
     connect( debugAct, SIGNAL( triggered() ), this, SLOT( debug() ), Qt::UniqueConnection );
+}
+
+void EditorWidget::updateIcons() {
+    newAct->setIcon( getAppIcon( ":/new.svg" ) );
+    openAct->setIcon( getAppIcon( ":/open.svg" ) );
+    saveAct->setIcon( getAppIcon( ":/save.svg" ) );
+    saveAsAct->setIcon( getAppIcon( ":/saveas.svg" ) );
+    cutAct->setIcon( getAppIcon( ":/cut.svg" ) );
+    copyAct->setIcon( getAppIcon( ":/copy.svg" ) );
+    pasteAct->setIcon( getAppIcon( ":/paste.svg" ) );
+    undoAct->setIcon( getAppIcon( ":/undo.svg" ) );
+    redoAct->setIcon( getAppIcon( ":/redo.svg" ) );
+    runAct->setIcon( getAppIcon( ":/runtobk.png" ) );
+    stepAct->setIcon( getAppIcon( ":/step.svg" ) );
+    stepOverAct->setIcon( getAppIcon( ":/rotatecw.svg" ) );
+    pauseAct->setIcon( getAppIcon( ":/pause.svg" ) );
+    resetAct->setIcon( getAppIcon( ":/reset.svg" ) );
+    stopAct->setIcon( getAppIcon( ":/stop.svg" ) );
+    compileAct->setIcon( getAppIcon( ":/verify.svg" ) );
+    loadAct->setIcon( getAppIcon( ":/upload.svg" ) );
+    findQtAct->setIcon( getAppIcon( ":/find.svg" ) );
+    debugAct->setIcon( getAppIcon( ":/debug.svg" ) );
+    for ( QToolButton* btn : findChildren<QToolButton*>() ) {
+        if ( btn->menu() == &m_settingsMenu )
+            btn->setIcon( getAppIcon( ":/config.svg" ) );
+        else if ( btn->menu() == &m_fileMenu )
+            btn->setIcon( getAppIcon( ":/lastfiles.svg" ) );
+    }
 }
 
 void EditorWidget::createToolBars() {
@@ -803,7 +833,7 @@ void EditorWidget::createToolBars() {
     QToolButton* settingsButton = new QToolButton( this );
     settingsButton->setToolTip( tr( "Settings" ) );
     settingsButton->setMenu( &m_settingsMenu );
-    settingsButton->setIcon( QIcon( ":/config.svg" ) );
+    settingsButton->setIcon( getAppIcon( ":/config.svg" ) );
     settingsButton->setPopupMode( QToolButton::InstantPopup );
 
     for ( int i = 0; i < MaxRecentFiles; i++ )
@@ -811,7 +841,7 @@ void EditorWidget::createToolBars() {
     QToolButton* fileButton = new QToolButton( this );
     fileButton->setToolTip( tr( "Last Files" ) );
     fileButton->setMenu( &m_fileMenu );
-    fileButton->setIcon( QIcon( ":/lastfiles.svg" ) );
+    fileButton->setIcon( getAppIcon( ":/lastfiles.svg" ) );
     fileButton->setPopupMode( QToolButton::InstantPopup );
 
     double fs = MainWindow::self()->fontScale() * 20;

@@ -29,6 +29,7 @@ public:
     QString getFileDir( QString compName ) { return m_dirFileList.value( compName ); }
 
     void search( QString filter );
+    void updateColors();
 
     void setShortcut( QString s, QString c ) { m_shortCuts[s] = c; }
     QString getComponent( QString shortcut ) { return m_shortCuts.value( shortcut ); }

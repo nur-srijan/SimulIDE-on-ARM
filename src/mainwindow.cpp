@@ -125,6 +125,36 @@ void MainWindow::keyPressEvent( QKeyEvent* event ) {
         QMainWindow::keyPressEvent( event );
 }
 
+bool MainWindow::isDarkMode() const {
+    return qApp->palette().color( QPalette::Window ).value() < 128
+        || qApp->palette().color( QPalette::Base ).value() < 128;
+}
+
+void MainWindow::updateIcons() {
+    if ( m_sidepanel ) {
+        m_sidepanel->setTabIcon( 0, getAppIcon( ":/ic2.png" ) );
+        m_sidepanel->setTabIcon( 1, getAppIcon( ":/complib.svg" ) );
+        m_sidepanel->setTabIcon( 2, getAppIcon( ":/files.svg" ) );
+    }
+    if ( m_clearButton )
+        m_clearButton->setIcon( getAppIcon( ":/remove.svg" ) );
+    if ( m_circuitW )
+        m_circuitW->updateIcons();
+    if ( m_editor )
+        m_editor->updateIcons();
+}
+
+void MainWindow::changeEvent( QEvent* event ) {
+    if ( event->type() == QEvent::PaletteChange || event->type() == QEvent::ThemeChange ) {
+        if ( m_components )
+            m_components->updateColors();
+        if ( m_installer )
+            m_installer->updateColors();
+        updateIcons();
+    }
+    QMainWindow::changeEvent( event );
+}
+
 void MainWindow::closeEvent( QCloseEvent* event ) {
     if ( CircuitWidget::self()->isHiddenGui() )
         return;
@@ -248,30 +278,33 @@ void MainWindow::setState( QString state ) {
 }
 
 void MainWindow::createWidgets() {
-    QWidget* centralWidget = new QWidget( this );
-    setCentralWidget( centralWidget );
+    QWidget* baseWidget = new QWidget( this );
+    this->setCentralWidget( baseWidget );
 
-    QGridLayout* baseWidgetLayout = new QGridLayout( centralWidget );
+    QGridLayout* baseWidgetLayout = new QGridLayout( baseWidget );
     baseWidgetLayout->setSpacing( 0 );
     baseWidgetLayout->setContentsMargins( 0, 0, 0, 0 );
 
-    m_mainSplitter = new QSplitter( this );
-    m_mainSplitter->setOrientation( Qt::Horizontal );
+    m_mainSplitter = new QSplitter( Qt::Horizontal, this );
+    m_mainSplitter->setObjectName( "m_mainSplitter" );
 
     m_sidepanel = new QTabWidget( this );
-    m_sidepanel->setTabPosition( QTabWidget::North );
+    m_sidepanel->setObjectName( "m_sidepanel" );
+    m_mainSplitter->addWidget( m_sidepanel );
+
     m_sidepanel->setIconSize( QSize( 20 * m_fontScale, 20 * m_fontScale ) );
     //QString fontSize = QString::number( int(11*m_fontScale) );
     //m_sidepanel->tabBar()->setStyleSheet("QTabBar { font-size:"+fontSize+"px; }");
-    m_mainSplitter->addWidget( m_sidepanel );
 
     m_listWidget = new QWidget( this );
-    QVBoxLayout* listLayout = new QVBoxLayout( m_listWidget );
-    listLayout->setSpacing( 6 );
-    listLayout->setContentsMargins( 0, 2, 0, 0 );
 
-    QHBoxLayout* searchLayout = new QHBoxLayout( this );
-    searchLayout->setSpacing( 1 );
+    QVBoxLayout* listLayout = new QVBoxLayout( m_listWidget );
+    listLayout->setContentsMargins( 0, 0, 0, 0 );
+    listLayout->setSpacing( 0 );
+
+    QHBoxLayout* searchLayout = new QHBoxLayout();
+    searchLayout->setContentsMargins( 0, 0, 0, 0 );
+    searchLayout->setSpacing( 0 );
 
     m_searchComponent = new QLineEdit( this );
     QFont font = m_searchComponent->font();
@@ -284,7 +317,7 @@ void MainWindow::createWidgets() {
 
     m_clearButton = new QPushButton( this );
     m_clearButton->setFixedSize( 24 * m_fontScale, 24 * m_fontScale );
-    m_clearButton->setIcon( QIcon( ":/remove.svg" ) );
+    m_clearButton->setIcon( getAppIcon( ":/remove.svg" ) );
     m_clearButton->setToolTip( tr( "Clear search" ) );
 
     searchLayout->addWidget( m_clearButton );
@@ -299,9 +332,9 @@ void MainWindow::createWidgets() {
     m_components = new ComponentList( m_sidepanel );
     listLayout->addWidget( m_components );
 
-    m_sidepanel->addTab( m_listWidget, QIcon( ":/ic2.png" ), "" );
-    m_sidepanel->addTab( m_installer, QIcon( ":/complib.svg" ), "" );
-    m_sidepanel->addTab( m_fileTree, QIcon( ":/files.svg" ), "" );
+    m_sidepanel->addTab( m_listWidget, getAppIcon( ":/ic2.png" ), "" );
+    m_sidepanel->addTab( m_installer, getAppIcon( ":/complib.svg" ), "" );
+    m_sidepanel->addTab( m_fileTree, getAppIcon( ":/files.svg" ), "" );
 
     m_sidepanel->setTabToolTip( 0, tr( "Components" ) );
     m_sidepanel->setTabToolTip( 1, tr( "Libraries" ) );

@@ -12,12 +12,73 @@
 #include <QPointF>
 #include <QString>
 #include <QTextStream>
-#include <cmath>
-#include <qpoint.h>
+#include <QPainter>
+#include <QSvgRenderer>
 
 #include "mainwindow.h"
 #include "pin.h"
 #include "utils.h"
+
+QIcon getAppIcon( const QString& path ) {
+    bool dark = MainWindow::self() ? MainWindow::self()->isDarkMode() : false;
+    if ( !dark )
+        return QIcon( path );
+
+    if ( path.endsWith( ".svg", Qt::CaseInsensitive ) ) {
+        QFile file( path );
+        if ( file.open( QIODevice::ReadOnly ) ) {
+            QByteArray data = file.readAll();
+            file.close();
+
+            data.replace( "#000000", "#E8E8E8" );
+            data.replace( "#000", "#E8E8E8" );
+            data.replace( "#363636", "#E8E8E8" );
+            data.replace( "#333333", "#E8E8E8" );
+            data.replace( "#222222", "#E8E8E8" );
+            data.replace( "#111111", "#E8E8E8" );
+            data.replace( "fill:black", "fill:#E8E8E8" );
+            data.replace( "stroke:black", "stroke:#E8E8E8" );
+            data.replace( "fill:#000000", "fill:#E8E8E8" );
+            data.replace( "stroke:#000000", "stroke:#E8E8E8" );
+
+            QSvgRenderer renderer( data );
+            if ( renderer.isValid() ) {
+                QSize sz = renderer.defaultSize();
+                if ( !sz.isValid() || sz.isEmpty() )
+                    sz = QSize( 32, 32 );
+                else
+                    sz = sz * 2;
+                QPixmap pixmap( sz );
+                pixmap.fill( Qt::transparent );
+                QPainter painter( &pixmap );
+                renderer.render( &painter );
+                return QIcon( pixmap );
+            }
+        }
+    } else if ( path.endsWith( ".png", Qt::CaseInsensitive ) ) {
+        QImage img( path );
+        if ( !img.isNull() ) {
+            img = img.convertToFormat( QImage::Format_ARGB32 );
+            for ( int y = 0; y < img.height(); ++y ) {
+                QRgb* line = (QRgb*) img.scanLine( y );
+                for ( int x = 0; x < img.width(); ++x ) {
+                    int a = qAlpha( line[x] );
+                    if ( a > 0 ) {
+                        int r = qRed( line[x] );
+                        int g = qGreen( line[x] );
+                        int b = qBlue( line[x] );
+                        if ( r < 100 && g < 100 && b < 100 ) {
+                            line[x] = qRgba( 235 - r, 235 - g, 235 - b, a );
+                        }
+                    }
+                }
+            }
+            return QIcon( QPixmap::fromImage( img ) );
+        }
+    }
+
+    return QIcon( path );
+}
 
 QMap<QString, double> multipliers = { { "p", 1e-12 }, { "n", 1e-9 }, { "µ", 1e-6 }, { "m", 1e-3 },
                                       { "k", 1e3 },   { "M", 1e6 },  { "G", 1e9 },  { "T", 1e12 } };
@@ -174,7 +235,9 @@ QString fileToString( QString fileName, QString caller ) {
         return "";
     }
     QTextStream in( &file );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     in.setCodec( "UTF-8" );
+#endif
     QString text = in.readAll();
     file.close();
 

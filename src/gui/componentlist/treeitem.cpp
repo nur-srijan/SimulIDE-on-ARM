@@ -26,8 +26,6 @@ TreeItem::TreeItem( TreeItem* parent, QString name, QString nameTr, QString comp
 TreeItem::~TreeItem() { }
 
 void TreeItem::setItemType( treItemType_t itemType ) {
-    if ( m_itemType == itemType )
-        return;
     m_itemType = itemType;
 
     float scale = MainWindow::self()->fontScale();
@@ -41,35 +39,15 @@ void TreeItem::setItemType( treItemType_t itemType ) {
         if ( icon( 0 ).isNull() )
             setSizeHint( 0, QSize( 100, 14 * scale ) );
 
-        if ( m_isCustom )
-            setForeground( 0, QColor( 80, 90, 110 ) );
-        else
-            setForeground( 0, QColor( 100, 90, 60 ) );
-
         font.setPixelSize( 11 * scale );
-    } else // Is Category
-    {
+    } else { // Is Category
         setChildIndicatorPolicy( TreeItem::ShowIndicator );
         setFlags( QFlag( Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled ) );
 
         if ( itemType == categ_MAIN ) {
-            if ( m_isCustom ) {
-                setForeground( 0, QColor( 50, 60, 80 ) );
-                setBackground( 0, QBrush( QColor( 220, 235, 240 ) ) );
-            } else {
-                setForeground( 0, QColor( 75, 70, 10 ) );
-                setBackground( 0, QBrush( QColor( 220, 240, 235 ) ) );
-            }
             setSizeHint( 0, QSize( 100, 30 * scale ) );
             font.setPixelSize( 13 * scale );
         } else if ( itemType == categ_CHILD ) {
-            if ( m_isCustom ) {
-                setForeground( 0, QColor( 70, 80, 100 ) );
-                setBackground( 0, QBrush( QColor( 230, 245, 250 ) ) );
-            } else {
-                setForeground( 0, QColor( 90, 80, 50 ) );
-                setBackground( 0, QBrush( QColor( 230, 250, 245 ) ) );
-            }
             if ( icon( 0 ).isNull() )
                 setSizeHint( 0, QSize( 100, 16 * scale ) );
             else
@@ -78,6 +56,57 @@ void TreeItem::setItemType( treItemType_t itemType ) {
         }
     }
     setFont( 0, font );
+    updateColors();
+}
+
+void TreeItem::updateColors() {
+    bool dark = MainWindow::self() ? MainWindow::self()->isDarkMode() : false;
+
+    if ( m_itemType == component ) {
+        if ( dark ) {
+            setForeground( 0, m_isCustom ? QColor( 160, 195, 235 ) : QColor( 220, 220, 220 ) );
+        } else {
+            setForeground( 0, m_isCustom ? QColor( 80, 90, 110 ) : QColor( 100, 90, 60 ) );
+        }
+    } else { // Is Category
+        if ( m_itemType == categ_MAIN ) {
+            if ( dark ) {
+                if ( m_isCustom ) {
+                    setForeground( 0, QColor( 210, 230, 250 ) );
+                    setBackground( 0, QBrush( QColor( 38, 52, 68 ) ) );
+                } else {
+                    setForeground( 0, QColor( 220, 240, 232 ) );
+                    setBackground( 0, QBrush( QColor( 42, 62, 56 ) ) );
+                }
+            } else {
+                if ( m_isCustom ) {
+                    setForeground( 0, QColor( 50, 60, 80 ) );
+                    setBackground( 0, QBrush( QColor( 220, 235, 240 ) ) );
+                } else {
+                    setForeground( 0, QColor( 75, 70, 10 ) );
+                    setBackground( 0, QBrush( QColor( 220, 240, 235 ) ) );
+                }
+            }
+        } else if ( m_itemType == categ_CHILD ) {
+            if ( dark ) {
+                if ( m_isCustom ) {
+                    setForeground( 0, QColor( 195, 218, 238 ) );
+                    setBackground( 0, QBrush( QColor( 32, 44, 58 ) ) );
+                } else {
+                    setForeground( 0, QColor( 205, 228, 220 ) );
+                    setBackground( 0, QBrush( QColor( 34, 50, 45 ) ) );
+                }
+            } else {
+                if ( m_isCustom ) {
+                    setForeground( 0, QColor( 70, 80, 100 ) );
+                    setBackground( 0, QBrush( QColor( 230, 245, 250 ) ) );
+                } else {
+                    setForeground( 0, QColor( 90, 80, 50 ) );
+                    setBackground( 0, QBrush( QColor( 230, 250, 245 ) ) );
+                }
+            }
+        }
+    }
 }
 
 void TreeItem::setItemExpanded( bool e ) {

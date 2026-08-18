@@ -47,6 +47,7 @@ public:
     QSettings* compSettings();
 
     void hideGui();
+    void updateIcons();
 
     void readSettings();
 
@@ -83,6 +84,8 @@ public:
     void setUserPath( QString p );
     void getUserPath(); // File open Dialog
 
+    bool isDarkMode() const;
+
     Installer* installer() { return m_installer; }
 
     static MainWindow* self() { return m_pSelf; }
@@ -90,6 +93,7 @@ public:
 protected:
     void closeEvent( QCloseEvent* event );
     void keyPressEvent( QKeyEvent* event );
+    void changeEvent( QEvent* event );
 
 private slots:
     void searchChanged();

@@ -28,6 +28,7 @@ public:
     void unInstallItem( QString itemName );
 
     void writeSettings();
+    void updateColors();
 
     QStringList getGroupItems( QString group ) { return m_groupItemList.value( group ); }
 

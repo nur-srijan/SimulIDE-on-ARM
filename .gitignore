@@ -1,1 +1,30 @@
+# Build directories and generated files
+build*/
+build_XX/
+*.o
+*.a
+*.dylib
+*.app/
+*.qmake.stash
+Makefile*
+ui_*.h
+qrc_*.cpp
+moc_*.cpp
+
+# Translation binaries
 resources/qm/*.*
+
+# macOS artifacts
+.DS_Store
+**/.DS_Store
+
+# Logs and crash reports
+*.log
+
+# IDE & Editor configurations
+.vscode/
+.idea/
+*.user
+*.user.*
+*.swp
+*~

@@ -116,32 +116,32 @@ void CircuitWidget::createActions() {
         connect( recentFileActs[i], &QAction::triggered, this, &CircuitWidget::openRecentFile, Qt::UniqueConnection );
     }
 
-    newCircAct = new QAction( QIcon( ":/new.svg" ), tr( "New C&ircuit\tCtrl+N" ), this );
+    newCircAct = new QAction( getAppIcon( ":/new.svg" ), tr( "New C&ircuit\tCtrl+N" ), this );
     newCircAct->setStatusTip( tr( "Create a new Circuit" ) );
     connect( newCircAct, &QAction::triggered, this, &CircuitWidget::newCircuit, Qt::UniqueConnection );
 
-    openCircAct = new QAction( QIcon( ":/open.svg" ), tr( "&Open Circuit\tCtrl+O" ), this );
+    openCircAct = new QAction( getAppIcon( ":/open.svg" ), tr( "&Open Circuit\tCtrl+O" ), this );
     openCircAct->setStatusTip( tr( "Open an existing Circuit" ) );
     connect( openCircAct, &QAction::triggered, this, &CircuitWidget::openCirc, Qt::UniqueConnection );
 
-    saveCircAct = new QAction( QIcon( ":/save.svg" ), tr( "&Save Circuit\tCtrl+S" ), this );
+    saveCircAct = new QAction( getAppIcon( ":/save.svg" ), tr( "&Save Circuit\tCtrl+S" ), this );
     saveCircAct->setStatusTip( tr( "Save the Circuit to disk" ) );
     connect( saveCircAct, &QAction::triggered, this, QOverload<>::of( &CircuitWidget::saveCirc ),
              Qt::UniqueConnection );
 
-    saveCircAsAct = new QAction( QIcon( ":/saveas.svg" ), tr( "Save Circuit &As...\tCtrl+Shift+S" ), this );
+    saveCircAsAct = new QAction( getAppIcon( ":/saveas.svg" ), tr( "Save Circuit &As...\tCtrl+Shift+S" ), this );
     saveCircAsAct->setStatusTip( tr( "Save the Circuit under a new name" ) );
     connect( saveCircAsAct, &QAction::triggered, this, &CircuitWidget::saveCircAs, Qt::UniqueConnection );
 
-    zoomFitAct = new QAction( QIcon( ":/zoomfit.svg" ), tr( "Zoom to fit" ), this );
+    zoomFitAct = new QAction( getAppIcon( ":/zoomfit.svg" ), tr( "Zoom to fit" ), this );
     zoomFitAct->setStatusTip( tr( "Zoom Circuit to fit all components" ) );
     connect( zoomFitAct, &QAction::triggered, CircuitView::self(), &CircuitView::zoomToFit, Qt::UniqueConnection );
 
-    zoomSelAct = new QAction( QIcon( ":/zoomsel.svg" ), tr( "Zoom to selected" ), this );
+    zoomSelAct = new QAction( getAppIcon( ":/zoomsel.svg" ), tr( "Zoom to selected" ), this );
     zoomSelAct->setStatusTip( tr( "Zoom Circuit to fit all selected components" ) );
     connect( zoomSelAct, &QAction::triggered, CircuitView::self(), &CircuitView::zoomSelected, Qt::UniqueConnection );
 
-    zoomOneAct = new QAction( QIcon( ":/zoomone.svg" ), tr( "Zoom to Scale 1" ), this );
+    zoomOneAct = new QAction( getAppIcon( ":/zoomone.svg" ), tr( "Zoom to Scale 1" ), this );
     zoomOneAct->setStatusTip( tr( "Zoom Circuit to Scale 1:1" ) );
     connect( zoomOneAct, &QAction::triggered, CircuitView::self(), &CircuitView::zoomOne, Qt::UniqueConnection );
 
@@ -154,21 +154,39 @@ void CircuitWidget::createActions() {
     pauseSimAct->setStatusTip( tr( "Pause Simulation" ) );
     connect( pauseSimAct, &QAction::triggered, this, &CircuitWidget::pauseCirc, Qt::UniqueConnection );
 
-    settAppAct = new QAction( QIcon( ":/config.svg" ), tr( "Settings" ), this );
+    settAppAct = new QAction( getAppIcon( ":/config.svg" ), tr( "Settings" ), this );
     settAppAct->setStatusTip( tr( "Settings" ) );
     connect( settAppAct, &QAction::triggered, this, &CircuitWidget::settApp, Qt::UniqueConnection );
 
-    infoAct = new QAction( QIcon( ":/help.svg" ), tr( "SimulIDE Website" ), this );
+    infoAct = new QAction( getAppIcon( ":/help.svg" ), tr( "SimulIDE Website" ), this );
     infoAct->setStatusTip( tr( "SimulIDE Website" ) );
     connect( infoAct, &QAction::triggered, this, &CircuitWidget::openInfo, Qt::UniqueConnection );
 
-    aboutAct = new QAction( QIcon( ":/about.svg" ), tr( "About SimulIDE" ), this );
+    aboutAct = new QAction( getAppIcon( ":/about.svg" ), tr( "About SimulIDE" ), this );
     aboutAct->setStatusTip( tr( "About SimulIDE" ) );
     connect( aboutAct, &QAction::triggered, this, &CircuitWidget::about, Qt::UniqueConnection );
 
-    aboutQtAct = new QAction( QIcon( ":/about.svg" ), tr( "About Qt" ), this );
+    aboutQtAct = new QAction( getAppIcon( ":/about.svg" ), tr( "About Qt" ), this );
     aboutQtAct->setStatusTip( tr( "About Qt" ) );
     connect( aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt, Qt::UniqueConnection );
+}
+
+void CircuitWidget::updateIcons() {
+    newCircAct->setIcon( getAppIcon( ":/new.svg" ) );
+    openCircAct->setIcon( getAppIcon( ":/open.svg" ) );
+    saveCircAct->setIcon( getAppIcon( ":/save.svg" ) );
+    saveCircAsAct->setIcon( getAppIcon( ":/saveas.svg" ) );
+    zoomFitAct->setIcon( getAppIcon( ":/zoomfit.svg" ) );
+    zoomSelAct->setIcon( getAppIcon( ":/zoomsel.svg" ) );
+    zoomOneAct->setIcon( getAppIcon( ":/zoomone.svg" ) );
+    settAppAct->setIcon( getAppIcon( ":/config.svg" ) );
+    infoAct->setIcon( getAppIcon( ":/help.svg" ) );
+    aboutAct->setIcon( getAppIcon( ":/about.svg" ) );
+    aboutQtAct->setIcon( getAppIcon( ":/about.svg" ) );
+    for ( QToolButton* btn : m_circToolBar.findChildren<QToolButton*>() ) {
+        if ( btn->menu() == &m_fileMenu )
+            btn->setIcon( getAppIcon( ":/lastfiles.svg" ) );
+    }
 }
 
 void CircuitWidget::createToolBars() {
@@ -188,7 +206,7 @@ void CircuitWidget::createToolBars() {
     QToolButton* fileButton = new QToolButton( this );
     fileButton->setToolTip( tr( "Last Circuits" ) );
     fileButton->setMenu( &m_fileMenu );
-    fileButton->setIcon( QIcon( ":/lastfiles.svg" ) );
+    fileButton->setIcon( getAppIcon( ":/lastfiles.svg" ) );
     fileButton->setPopupMode( QToolButton::InstantPopup );
     m_circToolBar.addWidget( fileButton );
 

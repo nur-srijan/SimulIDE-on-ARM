@@ -87,7 +87,11 @@ QMAKE_CXXFLAGS += -fno-strict-aliasing      #AngelScript
 QMAKE_CXXFLAGS += -Wno-cast-function-type   #AngelScript
 QMAKE_CXXFLAGS += -Wno-deprecated-copy      #AngelScript
 QMAKE_CXXFLAGS += -Wno-invalid-offsetof     #AngelScript
-QMAKE_CXXFLAGS += -Ofast
+macx {
+    QMAKE_CXXFLAGS += -O3
+} else {
+    QMAKE_CXXFLAGS += -Ofast
+}
 QMAKE_CXXFLAGS_DEBUG += -D_GLIBCXX_ASSERTIONS
 QMAKE_CXXFLAGS_DEBUG -= -O
 QMAKE_CXXFLAGS_DEBUG -= -O1
@@ -109,14 +113,15 @@ macx {
     OS = MacOs
     ICON = $$PWD/resources/icons/simulide.icns
 
-    QMAKE_CXXFLAGS -= -stdlib=libc++
-    QMAKE_LFLAGS   -= -stdlib=libc++
-
-# To use gcc in MacOs you must force it.
-# Edit to match your system:
-    QMAKE_CC   = /usr/local/Cellar/gcc@7/7.5.0_4/bin/gcc-7
-    QMAKE_CXX  = /usr/local/Cellar/gcc@7/7.5.0_4/bin/g++-7
-    QMAKE_LINK = /usr/local/Cellar/gcc@7/7.5.0_4/bin/g++-7
+    # By default, use Clang (which requires libc++).
+    # If the forced GCC 7 path exists, use that instead.
+    exists(/usr/local/Cellar/gcc@7/7.5.0_4/bin/g++-7) {
+        QMAKE_CXXFLAGS -= -stdlib=libc++
+        QMAKE_LFLAGS   -= -stdlib=libc++
+        QMAKE_CC   = /usr/local/Cellar/gcc@7/7.5.0_4/bin/gcc-7
+        QMAKE_CXX  = /usr/local/Cellar/gcc@7/7.5.0_4/bin/g++-7
+        QMAKE_LINK = /usr/local/Cellar/gcc@7/7.5.0_4/bin/g++-7
+    }
 }
 
 contains( QMAKE_HOST.arch, arm64|aarch64 ) | contains( QMAKE_CC, .*aarch64.* ){
@@ -144,6 +149,7 @@ CONFIG *= c++11
 DEFINES += REVNO=\\\"$$REV_NO\\\"
 DEFINES += APP_VERSION=\\\"$$VERSION-$$RELEASE\\\"
 DEFINES += BUILDDATE=\\\"$$BUILD_DATE\\\"
+DEFINES += AS_NO_MEMORY_H
 
 TARGET_NAME   = SimulIDE_$$VERSION-$$RELEASE
 TARGET_PREFIX = $$BUILD_DIR/executables/$$TARGET_NAME

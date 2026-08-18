@@ -72,6 +72,7 @@ public slots:
     void findReplaceDialog();
     void reload();
     void updateDoc( int tab = 0 );
+    void updateIcons();
 
 protected slots:
     void confEditor();

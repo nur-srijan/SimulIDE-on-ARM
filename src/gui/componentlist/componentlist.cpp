@@ -40,7 +40,7 @@ ComponentList::ComponentList( QWidget* parent ) : QTreeWidget( parent ), m_mcDia
     viewport()->setAcceptDrops( true );
 
     float scale = MainWindow::self()->fontScale();
-    setIndentation( 6 * scale );
+    setIndentation( 16 * scale );
     setRootIsDecorated( true );
     setCursor( Qt::OpenHandCursor );
     headerItem()->setHidden( true );
@@ -49,6 +49,16 @@ ComponentList::ComponentList( QWidget* parent ) : QTreeWidget( parent ), m_mcDia
     createList();
 
     connect( this, &ComponentList::itemPressed, this, &ComponentList::slotItemClicked );
+    connect( this, &QTreeWidget::itemExpanded, this, []( QTreeWidgetItem* item ) {
+        TreeItem* tItem = static_cast<TreeItem*>( item );
+        if ( tItem )
+            tItem->setItemExpanded( true );
+    } );
+    connect( this, &QTreeWidget::itemCollapsed, this, []( QTreeWidgetItem* item ) {
+        TreeItem* tItem = static_cast<TreeItem*>( item );
+        if ( tItem )
+            tItem->setItemExpanded( false );
+    } );
 }
 ComponentList::~ComponentList() { }
 
@@ -442,6 +452,12 @@ void ComponentList::slotItemClicked( QTreeWidgetItem* item, int ) {
 
     TreeItem* treeItem = (TreeItem*) item;
 
+    if ( treeItem->childCount() > 0 || treeItem->itemType() > component ) {
+        treeItem->setExpanded( !treeItem->isExpanded() );
+        treeItem->setItemExpanded( treeItem->isExpanded() );
+        return;
+    }
+
     QMimeData* mimeData = new QMimeData;
     mimeData->setText( treeItem->name() + "," + treeItem->compType() );
 
@@ -506,6 +522,15 @@ void ComponentList::search( QString filter ) {
         }
     }
     m_searchFilter = filter;
+}
+
+void ComponentList::updateColors() {
+    QList<QTreeWidgetItem*> allItems = findItems( "", Qt::MatchContains | Qt::MatchRecursive, 0 );
+    for ( QTreeWidgetItem* it : allItems ) {
+        TreeItem* item = static_cast<TreeItem*>( it );
+        if ( item )
+            item->updateColors();
+    }
 }
 
 void ComponentList::readConfig() {

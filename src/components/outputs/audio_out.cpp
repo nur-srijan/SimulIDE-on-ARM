@@ -55,6 +55,32 @@ AudioOut::AudioOut( QString type, QString id ) : Component( type, id ), eResisto
     m_buzzer = false;
     m_audioOutput = nullptr;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    m_deviceinfo = QMediaDevices::defaultAudioOutput();
+    if ( m_deviceinfo.isNull() ) {
+        const auto deviceInfos = QMediaDevices::audioOutputs();
+        if ( deviceInfos.isEmpty() ) {
+            qDebug() << "   Error: No Audio Output Devices Found at all";
+            qDebug() << "Check that Qt6 multimedia packages are installed";
+        } else {
+            qDebug() << "   Error: No default Audio Output Device Found";
+            qDebug() << "Audio Output Devices available:";
+
+            for ( const QAudioDevice& deviceInfo : deviceInfos )
+                qDebug() << "Device name: " << deviceInfo.description();
+        }
+        qDebug() << " ";
+        return;
+    }
+    m_format = m_deviceinfo.preferredFormat();
+    m_format.setChannelCount( 1 );
+    m_format.setSampleFormat( QAudioFormat::UInt8 );
+
+    if ( !m_deviceinfo.isFormatSupported( m_format ) ) {
+        qDebug() << "Warning: Default format not supported";
+    }
+    m_audioOutput = new QAudioSink( m_deviceinfo, m_format );
+#else
     m_deviceinfo = QAudioDeviceInfo::defaultOutputDevice();
     if ( m_deviceinfo.isNull() ) {
         const auto deviceInfos = QAudioDeviceInfo::availableDevices( QAudio::AudioOutput );
@@ -87,6 +113,7 @@ AudioOut::AudioOut( QString type, QString id ) : Component( type, id ), eResisto
         qDebug() << m_format.sampleRate() << m_format.channelCount() << m_format.sampleSize();
     }
     m_audioOutput = new QAudioOutput( m_deviceinfo, m_format );
+#endif
 
     addPropGroup(
         { tr( "Main" ),
@@ -128,8 +155,14 @@ void AudioOut::stamp() {
     if ( m_deviceinfo.isNull() )
         return;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    m_audioBuffer = m_audioOutput->start();
+    m_dataSize = m_audioOutput->bufferSize() / 8;
+    if ( m_dataSize < 256 ) m_dataSize = 1024;
+#else
     m_audioBuffer = m_audioOutput->start();
     m_dataSize = m_audioOutput->periodSize();
+#endif
     m_dataBuffer.reserve( m_dataSize );
 
     if ( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )

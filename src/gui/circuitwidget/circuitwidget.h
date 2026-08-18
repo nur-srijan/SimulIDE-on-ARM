@@ -61,6 +61,7 @@ public slots:
     void settApp();
     void openInfo();
     void about();
+    void updateIcons();
 
 signals:
     void dataAvailable( int uart, const QByteArray& data );
