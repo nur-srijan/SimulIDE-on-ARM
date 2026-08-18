@@ -31,7 +31,7 @@ jobs:
         run: |
           export PATH="/opt/homebrew/opt/qt@6/bin:$PATH"
           cd build_XX
-          qmake ../SimulIDE.pro
+          qmake SimulIDE_Build.pro
           make -j$(sysctl -n hw.ncpu)
 
       - name: Bundle and create DMG with macdeployqt

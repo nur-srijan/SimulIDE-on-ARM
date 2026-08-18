@@ -49,7 +49,7 @@ export PATH="/opt/homebrew/opt/qt@6/bin:$PATH"
 2. **Generate the Makefile with qmake**:
    ```bash
    cd build_XX
-   qmake ../SimulIDE.pro
+   qmake SimulIDE_Build.pro
    ```
 
 3. **Compile**:
@@ -78,7 +78,7 @@ sudo apt-get install build-essential qtbase5-dev qtmultimedia5-dev \
 
 ```bash
 cd build_XX
-qmake ../SimulIDE.pro
+qmake SimulIDE_Build.pro
 make -j$(nproc)
 ```
 
