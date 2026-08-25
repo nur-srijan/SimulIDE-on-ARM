@@ -9,7 +9,7 @@ QT += svg
 QT += xml
 QT += widgets
 QT += concurrent
-QT += serialport
+!wasm: QT += serialport
 QT += multimedia widgets
 
 SOURCES      = $$files( $$PWD/src/*.cpp, true )
@@ -108,6 +108,9 @@ win32 {
 }
 linux {
     OS = Linux
+}
+wasm {
+    OS = Wasm
 }
 macx {
     OS = MacOs
