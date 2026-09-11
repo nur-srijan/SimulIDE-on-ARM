@@ -52,7 +52,9 @@ SerialPort::SerialPort( QString type, QString id )
     m_pin[1] = pinRx;
     m_receiver->setPins( { pinRx } );
 
+    #ifndef Q_OS_WASM
     m_serial = new QSerialPort( /*this*/ );
+#endif
     m_receiving = false;
     m_autoOpen = false;
 
@@ -75,7 +77,9 @@ SerialPort::SerialPort( QString type, QString id )
     m_proxy->setPos( QPoint( -8, -10 ) );
 
     QObject::connect( m_button, &CustomButton::clicked, [=]() { onbuttonclicked(); } );
+    #ifndef Q_OS_WASM
     QObject::connect( m_serial, &QSerialPort::readyRead, [=]() { readData(); } );
+#endif
 
     Simulator::self()->addToUpdateList( this );
 
@@ -119,14 +123,18 @@ void SerialPort::stamp() {
     m_sending = false;
     m_receiving = false;
 
+#ifndef Q_OS_WASM
     if ( m_autoOpen && !m_serial->isOpen() )
         m_button->click();
+#endif
 }
 
 void SerialPort::updateStep() {
     if ( m_serData.size() ) {
+#ifndef Q_OS_WASM
         if ( m_serial->isOpen() )
             m_serial->write( m_serData );
+#endif
         m_serData.clear();
     } else
         m_receiving = false;
@@ -146,6 +154,7 @@ void SerialPort::runEvent() {
 }
 
 void SerialPort::open() {
+#ifndef Q_OS_WASM
     if ( m_serial->isOpen() )
         close();
 
@@ -163,13 +172,19 @@ void SerialPort::open() {
         m_button->setChecked( false );
         MessageBoxNB( "Error", tr( "Cannot Open Port %1:\n%2." ).arg( m_portName ).arg( m_serial->errorString() ) );
     }
+#else
+    MessageBoxNB( "Error", tr( "Serial port is not supported in WebAssembly." ) );
+    m_button->setChecked( false );
+#endif
     m_receiving = false;
     update();
 }
 
 void SerialPort::close() {
+#ifndef Q_OS_WASM
     if ( m_serial->isOpen() )
         m_serial->close();
+#endif
     m_button->setText( tr( "Open" ) );
     m_receiving = false;
     m_sending = false;
@@ -177,7 +192,9 @@ void SerialPort::close() {
 }
 
 void SerialPort::readData() {
+#ifndef Q_OS_WASM
     m_uartData += m_serial->readAll();
+#endif
 }
 
 void SerialPort::setflip() {
@@ -244,7 +261,11 @@ void SerialPort::paint( QPainter* p, const QStyleOptionGraphicsItem* o, QWidget*
     p->setBrush( Qt::darkBlue );
     p->drawRoundedRect( m_area, 4, 4 );
 
-    if ( m_serial->isOpen() ) {
+    bool isOpen = false;
+#ifndef Q_OS_WASM
+    isOpen = m_serial->isOpen();
+#endif
+    if ( isOpen ) {
         if ( m_sending )
             p->setBrush( Qt::yellow );
         else
@@ -253,7 +274,7 @@ void SerialPort::paint( QPainter* p, const QStyleOptionGraphicsItem* o, QWidget*
         p->setBrush( Qt::black );
     p->drawRoundedRect( -21, -11, 8, 6, 2, 2 ); // Tx led
 
-    if ( m_serial->isOpen() ) {
+    if ( isOpen ) {
         if ( m_receiving )
             p->setBrush( Qt::yellow );
         else

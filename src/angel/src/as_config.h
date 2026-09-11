@@ -684,6 +684,11 @@
 #define AS_NO_ATOMIC
 #endif
 
+// Emscripten
+#elif defined( __EMSCRIPTEN__ )
+#define AS_MAX_PORTABILITY
+#define AS_NO_EXCEPTIONS
+
 // Android
 #elif defined( ANDROID ) || defined( __ANDROID__ )
 #define AS_ANDROID

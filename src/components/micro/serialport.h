@@ -5,7 +5,16 @@
 
 #pragma once
 
+#ifndef Q_OS_WASM
 #include <QSerialPort>
+#else
+namespace QSerialPort {
+    enum FlowControl { NoFlowControl };
+    enum Parity {};
+    enum StopBits {};
+    enum DataBits {};
+}
+#endif
 
 #include "component.h"
 #include "e-element.h"
@@ -66,7 +75,9 @@ private:
     CustomButton* m_button;
     QGraphicsProxyWidget* m_proxy;
 
+#ifndef Q_OS_WASM
     QSerialPort* m_serial;
+#endif
 
     bool m_receiving;
     bool m_sending;
